@@ -1,0 +1,82 @@
+version: '3.9'
+
+services:
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: cryptoquote-sqlserver
+    environment:
+      SA_PASSWORD: "YourStrong@Passw0rd"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Express"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    networks:
+      - cryptoquote-net
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -Q 'SELECT 1' -No -b"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+  coin-service:
+    build:
+      context: .
+      dockerfile: src/CryptoQuote.CoinService/Dockerfile
+    container_name: cryptoquote-coin-service
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - CoinMarketCap__ApiKey=${COINMARKETCAP_API_KEY}
+      - CoinMarketCap__BaseUrl=https://pro-api.coinmarketcap.com/
+    ports:
+      - "5001:8080"
+    networks:
+      - cryptoquote-net
+
+  exchange-service:
+    build:
+      context: .
+      dockerfile: src/CryptoQuote.ExchangeService/Dockerfile
+    container_name: cryptoquote-exchange-service
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - ExchangeRates__AccessKey=${EXCHANGERATES_ACCESS_KEY}
+      - ExchangeRates__BaseUrl=http://api.exchangeratesapi.io/
+    ports:
+      - "5002:8080"
+    networks:
+      - cryptoquote-net
+
+  api:
+    build:
+      context: .
+      dockerfile: src/CryptoQuote.API/Dockerfile
+    container_name: cryptoquote-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=CryptoQuoteDb;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;
+      - Services__CoinServiceUrl=http://coin-service:8080
+      - Services__ExchangeServiceUrl=http://exchange-service:8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      coin-service:
+        condition: service_started
+      exchange-service:
+        condition: service_started
+    networks:
+      - cryptoquote-net
+
+volumes:
+  sqlserver_data:
+
+networks:
+  cryptoquote-net:
+    driver: bridge

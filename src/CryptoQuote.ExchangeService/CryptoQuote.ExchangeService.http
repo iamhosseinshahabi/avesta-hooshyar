@@ -1,0 +1,6 @@
+@CryptoQuote.ExchangeService_HostAddress = http://localhost:5079
+
+GET {{CryptoQuote.ExchangeService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
