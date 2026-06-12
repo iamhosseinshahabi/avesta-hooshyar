@@ -90,7 +90,8 @@ If I were to suggest one improvement it would be making the acceptance criteria 
 
 ```json
 {
-  "name": "Senior Backend .NET Developer",
+  "job_title": "Senior Backend .NET Developer",
+  "name": "Hossein Shahabi",
   "core_skills": [".NET / C#", "ASP.NET Core", "Entity Framework Core", "SQL Server", "Docker"],
   "architecture_patterns": ["Clean Architecture", "CQRS", "Microservices", "Domain-Driven Design", "SOLID"],
   "principles": {
