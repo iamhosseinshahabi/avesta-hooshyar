@@ -92,6 +92,13 @@ If I were to suggest one improvement it would be making the acceptance criteria 
 {
   "job_title": "Senior Backend .NET Developer",
   "name": "Hossein Shahabi",
+  "born_at": 1987,
+  "born_in": "Ahvaz, Iran",
+  "live_in": "Tehran, Iran",
+  "family":{
+     "is_married": true,
+     "children" : 0
+  }
   "core_skills": [".NET / C#", "ASP.NET Core", "Entity Framework Core", "SQL Server", "Docker"],
   "architecture_patterns": ["Clean Architecture", "CQRS", "Microservices", "Domain-Driven Design", "SOLID"],
   "principles": {
